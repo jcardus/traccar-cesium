@@ -72,3 +72,10 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.custom-overlay {
+  z-index: 1;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}

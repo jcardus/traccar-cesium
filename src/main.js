@@ -2,7 +2,7 @@
 import {
     Cesium3DTileset,
     GpxDataSource,
-    HeadingPitchRange,
+    HeightReference, VelocityOrientationProperty,
     Viewer
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
@@ -31,7 +31,19 @@ async function init() {
     const gpxUrl = URL.createObjectURL(gpxBlob);
     const dataSource = await GpxDataSource.load(gpxUrl, {clampToGround: true})
     await viewer.dataSources.add(dataSource);
-    await viewer.zoomTo(dataSource, new HeadingPitchRange(0, -0.5, 2000))
+    await viewer.zoomTo(dataSource)
+    const entity = dataSource.entities.values[0]
+    const positionProperty = entity.position;
+    entity.orientation = new VelocityOrientationProperty(positionProperty);
+    entity.model = {
+        uri: 'traccar-cesium/CesiumMilkTruck.glb',
+        scale: 2.5,
+        heightReference: HeightReference.CLAMP_TO_3D_TILE,
+    }
+    document.getElementById('follow')
+        .addEventListener('click', e =>
+            viewer.trackedEntity = e.target.checked ? entity : undefined
+    )
 }
 
 init().then()

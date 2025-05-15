@@ -23,6 +23,7 @@ const viewer = new Viewer("app", {
 });
 
 async function init() {
+    document.title = `Routes 3D ${import.meta.env.VITE_APP_VERSION}`
     viewer.scene.primitives.add(await Cesium3DTileset.fromUrl(
         `https://tile.googleapis.com/v1/3dtiles/root.json?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
         {enableCollision: true}

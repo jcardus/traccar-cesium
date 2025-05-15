@@ -1,29 +1,34 @@
 
 import {
-    Cartesian3,
+    Cartesian3, Cesium3DTileset, Color,
     Math as CesiumMath,
-    Terrain,
-    Viewer,
-    createOsmBuildingsAsync,
+    Viewer
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
 
-// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
 const viewer = new Viewer("app", {
-    terrain: Terrain.fromWorldTerrain(),
+    baseLayerPicker: false,
+    imageryProvider: false,
+    homeButton: false,
+    fullscreenButton: false,
+    navigationHelpButton: false,
+    sceneModePicker: false,
+    geocoder: false,
+    infoBox: false,
+    selectionIndicator: false,
 });
 
-// Fly the camera to San Francisco at the given longitude, latitude, and height.
+viewer.scene.globe.baseColor = Color.TRANSPARENT;
+viewer.scene.primitives.add(await Cesium3DTileset.fromUrl(
+    `https://tile.googleapis.com/v1/3dtiles/root.json?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
+    {enableCollision: true}
+))
+
 viewer.camera.flyTo({
     destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
     orientation: {
         heading: CesiumMath.toRadians(0.0),
         pitch: CesiumMath.toRadians(-15.0),
     },
-});
-
-// Add Cesium OSM Buildings, a global 3D buildings layer.
-createOsmBuildingsAsync().then((buildingTileset) => {
-    viewer.scene.primitives.add(buildingTileset);
 });

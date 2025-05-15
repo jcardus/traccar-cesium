@@ -37,7 +37,7 @@ async function init() {
     const positionProperty = entity.position;
     entity.orientation = new VelocityOrientationProperty(positionProperty);
     entity.model = {
-        uri: 'traccar-cesium/CesiumMilkTruck.glb',
+        uri: 'CesiumMilkTruck.glb',
         scale: 2.5,
         heightReference: HeightReference.CLAMP_TO_3D_TILE,
     }

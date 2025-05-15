@@ -1,24 +1,29 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+import {
+    Cartesian3,
+    Math as CesiumMath,
+    Terrain,
+    Viewer,
+    createOsmBuildingsAsync,
+} from "cesium";
+import "cesium/Build/Cesium/Widgets/widgets.css";
+import "./style.css";
 
-setupCounter(document.querySelector('#counter'))
+// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+const viewer = new Viewer("app", {
+    terrain: Terrain.fromWorldTerrain(),
+});
+
+// Fly the camera to San Francisco at the given longitude, latitude, and height.
+viewer.camera.flyTo({
+    destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
+    orientation: {
+        heading: CesiumMath.toRadians(0.0),
+        pitch: CesiumMath.toRadians(-15.0),
+    },
+});
+
+// Add Cesium OSM Buildings, a global 3D buildings layer.
+createOsmBuildingsAsync().then((buildingTileset) => {
+    viewer.scene.primitives.add(buildingTileset);
+});

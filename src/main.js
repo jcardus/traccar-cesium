@@ -19,16 +19,21 @@ const viewer = new Viewer("app", {
     selectionIndicator: false,
 });
 
-viewer.scene.globe.baseColor = Color.TRANSPARENT;
-viewer.scene.primitives.add(await Cesium3DTileset.fromUrl(
-    `https://tile.googleapis.com/v1/3dtiles/root.json?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
-    {enableCollision: true}
-))
+async function init() {
 
-viewer.camera.flyTo({
-    destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
-    orientation: {
-        heading: CesiumMath.toRadians(0.0),
-        pitch: CesiumMath.toRadians(-15.0),
-    },
-});
+    viewer.scene.globe.baseColor = Color.TRANSPARENT;
+    viewer.scene.primitives.add(await Cesium3DTileset.fromUrl(
+        `https://tile.googleapis.com/v1/3dtiles/root.json?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
+        {enableCollision: true}
+    ))
+
+    viewer.camera.flyTo({
+        destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
+        orientation: {
+            heading: CesiumMath.toRadians(0.0),
+            pitch: CesiumMath.toRadians(-15.0),
+        },
+    })
+}
+
+init().then()

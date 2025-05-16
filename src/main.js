@@ -2,7 +2,7 @@ import {
     Cesium3DTileset,
     HeightReference,
     VelocityOrientationProperty,
-    Viewer, CzmlDataSource, GpxDataSource
+    Viewer, CzmlDataSource
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
@@ -21,12 +21,6 @@ const viewer = new Viewer("app", {
     infoBox: false,
     selectionIndicator: false,
 });
-
-async function getGpxDataSource(positions) {
-    const gpxBlob = new Blob([positions], {type: 'application/gpx+xml'});
-    const gpxUrl = URL.createObjectURL(gpxBlob);
-    return GpxDataSource.load(gpxUrl, {clampToGround: true})
-}
 
 async function init() {
     document.title = `Routes 3D ${import.meta.env.VITE_APP_VERSION}`

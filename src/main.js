@@ -1,13 +1,13 @@
-
 import {
     Cesium3DTileset,
-    GpxDataSource,
-    HeightReference, VelocityOrientationProperty,
-    Viewer
+    HeightReference,
+    VelocityOrientationProperty,
+    Viewer, CzmlDataSource, GpxDataSource
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
-import {getPositions} from "./traccar.js";
+import {getPositions, getTrips, traccarPositionsToCzml} from "./traccar.js";
+import {snapToRoads} from "./valhalla.js";
 
 
 const viewer = new Viewer("app", {
@@ -22,15 +22,23 @@ const viewer = new Viewer("app", {
     selectionIndicator: false,
 });
 
+async function getGpxDataSource(positions) {
+    const gpxBlob = new Blob([positions], {type: 'application/gpx+xml'});
+    const gpxUrl = URL.createObjectURL(gpxBlob);
+    return GpxDataSource.load(gpxUrl, {clampToGround: true})
+}
+
 async function init() {
     document.title = `Routes 3D ${import.meta.env.VITE_APP_VERSION}`
     viewer.scene.primitives.add(await Cesium3DTileset.fromUrl(
         `https://tile.googleapis.com/v1/3dtiles/root.json?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
         {enableCollision: true}
     ))
-    const gpxBlob = new Blob([await getPositions()], { type: 'application/gpx+xml' });
-    const gpxUrl = URL.createObjectURL(gpxBlob);
-    const dataSource = await GpxDataSource.load(gpxUrl, {clampToGround: true})
+    const [trip] = await getTrips();
+    const positions = await getPositions(trip)
+    const snappedPositions = await snapToRoads(positions)
+    const czml = traccarPositionsToCzml(snappedPositions)
+    const dataSource = await CzmlDataSource.load(czml)
     await viewer.dataSources.add(dataSource);
     await viewer.zoomTo(dataSource)
     const entity = dataSource.entities.values[0]
@@ -41,9 +49,8 @@ async function init() {
         scale: 2.5,
         heightReference: HeightReference.CLAMP_TO_3D_TILE,
     }
-    document.getElementById('follow')
-        .addEventListener('click', e =>
-            viewer.trackedEntity = e.target.checked ? entity : undefined
+    document.getElementById('follow').addEventListener('click',
+            e => viewer.trackedEntity = e.target.checked ? entity : undefined
     )
 }
 

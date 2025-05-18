@@ -65,10 +65,6 @@ export function traccarPositionsToCzml(positions) {
                 interpolationAlgorithm: "LINEAR",
                 forwardExtrapolationType: "HOLD",
                 cartesian: []
-            },
-            orientation: {
-                // Static orientation for now; replace with computed quaternions if needed
-                unitQuaternion: [0.0, 0.0, 0.0, 1.0]
             }
         },
         {
@@ -80,10 +76,10 @@ export function traccarPositionsToCzml(positions) {
                 material: {
                     polylineOutline: {
                         color: { rgba: [100, 149, 237, 140] },
-                        outlineWidth: 0
+                        outlineWidth: 1
                     }
                 },
-                width: 12,
+                width: 8,
                 clampToGround: true
             }
         }

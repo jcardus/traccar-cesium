@@ -92,7 +92,7 @@ export function traccarPositionsToCzml(positions) {
     for (const pos of positions) {
         const time = pos.fixTime;
         const cartesian = Ellipsoid.WGS84.cartographicToCartesian(
-            Cartographic.fromDegrees(pos.longitude, pos.latitude, pos.altitude ?? 0)
+            Cartographic.fromDegrees(pos.longitude, pos.latitude, 0)
         );
 
         modelPositionList.push(time);

@@ -10,7 +10,7 @@ export async function getTrips() {
         `${import.meta.env.VITE_TRACCAR_API_BASE_URL}/reports/trips${window.location.search}`,
         {
             headers: {
-                'authorization': `Bearer ${token}`,
+                 ...(token ? {'authorization': `Bearer ${token}`} : {}),
                 'accept': 'application/json',
             }
         })
@@ -32,7 +32,7 @@ export async function getPositions(trip, format='') {
         `${import.meta.env.VITE_TRACCAR_API_BASE_URL}/positions${format}?${query.toString()}`,
         {
             headers: {
-                'authorization': `Bearer ${token}`,
+                ...(token ? {'authorization': `Bearer ${token}`} : {}),
                 'accept': 'application/json',
             }
         })

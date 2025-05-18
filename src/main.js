@@ -49,7 +49,7 @@ async function init() {
     document.getElementById('follow').addEventListener('click',
             e => viewer.trackedEntity = e.target.checked ? entity : undefined
     )
-    document.getElementById('lblFollow').innerText = `Follow ${new URLSearchParams(window.location.search).get('name')}`
+    document.getElementById('lblFollow').innerText = `Seguir ${new URLSearchParams(window.location.search).get('name')}`
 }
 
 init().then()

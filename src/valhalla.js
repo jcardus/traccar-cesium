@@ -1,4 +1,17 @@
-const valhallaUrl = 'https://nominatim-cl-pt.fleetmap.org'
+function getCountry(position) {
+    const c = position?.address.split(',').slice(-1)[0].trim()
+    switch (c) {
+        case 'Brazil':
+        case 'Brasil':
+            return 'BR'
+        case 'Portugal':
+            return 'PT'
+        case 'Chile':
+            return 'CL'
+        default:
+            return c
+    }
+}
 export async function snapToRoads(positions) {
     const body = {
         shape: positions.map(pos => ({lat: pos.latitude, lon: pos.longitude})),
@@ -10,7 +23,7 @@ export async function snapToRoads(positions) {
         }
     };
 
-    const response = await fetch(`${valhallaUrl}/trace_attributes`, {
+    const response = await fetch(`https://valhalla-${getCountry(positions.find(p => p.address))}.fleetmap.org/trace_attributes`, {
         method: "POST",
         body: JSON.stringify(body)
     });

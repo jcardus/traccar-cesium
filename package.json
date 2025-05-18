@@ -13,6 +13,8 @@
     "vite-plugin-static-copy": "^3.0.0"
   },
   "dependencies": {
+    "@turf/distance": "^7.2.0",
+    "@turf/helpers": "^7.2.0",
     "cesium": "^1.129.0"
   }
 }

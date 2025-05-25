@@ -79,3 +79,9 @@ button:focus-visible {
   top: 10px;
   left: 10px;
 }
+
+.custom-overlay.speedometer {
+  right: 10px;
+  bottom: auto;
+  left: auto;
+}

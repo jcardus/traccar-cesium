@@ -16,6 +16,8 @@ export async function getTrips() {
         })
     if (response.ok) {
         return response.json()
+    } else {
+        throw Error(await response.text())
     }
 }
 

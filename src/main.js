@@ -2,7 +2,7 @@ import {
     Cesium3DTileset,
     HeightReference,
     VelocityOrientationProperty,
-    Viewer, CzmlDataSource
+    Viewer, CzmlDataSource, JulianDate, Timeline
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
@@ -24,6 +24,9 @@ const viewer = new Viewer("app", {
 
 async function init() {
     document.title = `Routes 3D ${import.meta.env.VITE_APP_VERSION}`
+    Timeline.prototype.makeLabel = (time) => JulianDate.toDate(time).toLocaleString();
+    viewer.animation.viewModel.timeFormatter = (date) => JulianDate.toDate(date).toLocaleTimeString()
+    viewer.animation.viewModel.dateFormatter = (date) => JulianDate.toDate(date).toLocaleDateString()
     viewer.scene.primitives.add(await Cesium3DTileset.fromUrl(
         `https://tile.googleapis.com/v1/3dtiles/root.json?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
         {enableCollision: true}

@@ -72,7 +72,8 @@ export async function snapToRoads(_positions) {
 
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Valhalla error: ${response.status} ${errorText}`);
+        console.error(`${response.status} ${errorText}`)
+        return _positions
     }
 
     const {matched_points} = await response.json();

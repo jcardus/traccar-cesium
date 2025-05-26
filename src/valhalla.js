@@ -64,26 +64,30 @@ export async function snapToRoads(_positions) {
             attributes: ['matched.point']
         }
     };
+    try {
+        const response = await fetch(`https://valhalla-${getCountry(positions.find(p => p.address))}.fleetmap.org/trace_attributes`, {
+            method: "POST",
+            body: JSON.stringify(body)
+        });
 
-    const response = await fetch(`https://valhalla-${getCountry(positions.find(p => p.address))}.fleetmap.org/trace_attributes`, {
-        method: "POST",
-        body: JSON.stringify(body)
-    });
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`${response.status} ${errorText}`)
+            return _positions
+        }
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`${response.status} ${errorText}`)
+        const {matched_points} = await response.json();
+
+        return matched_points.map((pt, i) => {
+            const {lon, lat} = pt
+            return {
+                ...positions[i], // keep original time, altitude, etc.
+                latitude: lat,
+                longitude: lon
+            };
+        });
+    } catch (e) {
+        console.error(e)
         return _positions
     }
-
-    const {matched_points} = await response.json();
-
-    return matched_points.map((pt, i) => {
-        const {lon, lat} = pt
-        return {
-            ...positions[i], // keep original time, altitude, etc.
-            latitude: lat,
-            longitude: lon
-        };
-    });
 }

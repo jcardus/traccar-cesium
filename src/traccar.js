@@ -78,10 +78,10 @@ export function traccarPositionsToCzml(positions) {
                 material: {
                     polylineOutline: {
                         color: { rgba: [0xEB, 0x4F, 0x27, 240] },
-                        outlineWidth: 2
+                        outlineWidth: 1
                     }
                 },
-                width: 10,
+                width: 3,
                 clampToGround: true
             }
         }

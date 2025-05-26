@@ -1,44 +1,64 @@
 import {
-    Cesium3DTileset,
+    Math as CesiumMath,
     HeightReference,
     VelocityOrientationProperty,
-    Viewer, CzmlDataSource, JulianDate, Timeline
+    Viewer,
+    CzmlDataSource,
+    JulianDate,
+    Timeline,
+    RequestScheduler,
+    createGooglePhotorealistic3DTileset,
+    IonGeocodeProviderType, Ion, HeadingPitchRange
 } from "cesium";
 import "cesium/Build/Cesium/Widgets/widgets.css";
 import "./style.css";
 import {getPositions, getTrips, traccarPositionsToCzml} from "./traccar.js";
 import {snapToRoads} from "./valhalla.js";
 import {RadialGauge} from 'canvas-gauges'
+Ion.defaultAccessToken = import.meta.env.VITE_ION_ACCESS_TOKEN
 
 let indexed = {}
 let gaugeSpeed
 
 
 const viewer = new Viewer("app", {
-    baseLayerPicker: false,
-    imageryProvider: false,
-    homeButton: false,
-    fullscreenButton: false,
-    navigationHelpButton: false,
     sceneModePicker: false,
-    geocoder: false,
-    infoBox: false,
-    selectionIndicator: false,
+    homeButton: false,
+    geocoder: IonGeocodeProviderType.GOOGLE,
+    globe: false
 });
 
 
+function addFollowCheckBox(entity) {
+    const toolbar = document.querySelector("div.cesium-viewer-toolbar");
+    const chkFollow = document.createElement("input");
+    chkFollow.type = 'checkbox'
+    chkFollow.classList.add('toolbar-button')
+    const label = document.createElement('label')
+    label.classList.add('toolbar-label')
+    label.innerText = `Seguir ${new URLSearchParams(window.location.search).get('name')}`
+    label.appendChild(chkFollow)
+    toolbar.insertBefore(label, toolbar.firstChild);
+    chkFollow.addEventListener('click',
+        e => viewer.trackedEntity = e.target.checked ? entity : undefined
+    )
+    chkFollow.click()
+}
+
 async function init() {
-    document.getElementById('loading-overlay').style.display = 'flex';
     try {
-        initGauge()
+        document.getElementById('loading-overlay').style.display = 'flex';
         document.title = `Routes 3D ${import.meta.env.VITE_APP_VERSION}`
-        Timeline.prototype.makeLabel = (time) => JulianDate.toDate(time).toLocaleString();
+        initGauge()
+        viewer._cesiumWidget._creditContainer.style.display = "none";
+        Timeline.prototype.makeLabel = (time) => JulianDate.toDate(time).toLocaleString()
+        RequestScheduler.requestsByServer["tile.googleapis.com:443"] = 18
         viewer.animation.viewModel.timeFormatter = (date) => JulianDate.toDate(date).toLocaleTimeString()
         viewer.animation.viewModel.dateFormatter = (date) => JulianDate.toDate(date).toLocaleDateString()
-        viewer.scene.primitives.add(await Cesium3DTileset.fromUrl(
-            `https://tile.googleapis.com/v1/3dtiles/root.json?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`,
-            {enableCollision: true}
-        ))
+        viewer.scene.skyAtmosphere.show = true;
+        viewer.scene.primitives.add(await createGooglePhotorealistic3DTileset({
+            onlyUsingWithGoogleGeocoder: true,
+        }))
         viewer.clock.onTick.addEventListener(() => {
             if (!viewer.clock.shouldAnimate) return;
             const date = JulianDate.toDate(viewer.clock.currentTime)
@@ -58,7 +78,6 @@ async function init() {
         const czml = traccarPositionsToCzml(snappedPositions)
         const dataSource = await CzmlDataSource.load(czml)
         await viewer.dataSources.add(dataSource);
-        await viewer.zoomTo(dataSource)
         const entity = dataSource.entities.values[0]
         const positionProperty = entity.position;
         entity.orientation = new VelocityOrientationProperty(positionProperty);
@@ -70,10 +89,20 @@ async function init() {
             scale: 2.5,
             heightReference: HeightReference.CLAMP_TO_3D_TILE,
         }
-        document.getElementById('follow').addEventListener('click',
-            e => viewer.trackedEntity = e.target.checked ? entity : undefined
-        )
-        document.getElementById('lblFollow').innerText = `Seguir ${new URLSearchParams(window.location.search).get('name')}`
+        addFollowCheckBox(entity)
+        setTimeout(() => {
+            viewer.camera.zoomOut(250); // Zoom out by 1000 meters
+            const center = entity.position.getValue(viewer.clock.currentTime);
+            viewer.scene.camera.lookAt(
+                center,
+                new HeadingPitchRange(
+                    0.0,
+                    CesiumMath.toRadians(-25),
+                    100.0
+                )
+            );
+            viewer.clock.shouldAnimate = true;
+        }, 1000); // wait a bit to ensure camera is focused
     } catch (e) {
         console.error(e)
         alert(e.message)

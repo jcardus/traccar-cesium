@@ -73,17 +73,31 @@ button:focus-visible {
   }
 }
 
+.toolbar-label {
+  background: #303336;
+  border: 1px solid #444;
+  color: #edffff; /* For text buttons */
+  border-radius: 4px;
+  padding: 5px 12px;
+  margin: 2px 3px;
+  width: 32px;
+  height: 32px;
+}
+
+.toolbar-button {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+
 .custom-overlay {
   z-index: 1;
   position: absolute;
-  top: 10px;
-  left: 10px;
 }
 
 .custom-overlay.speedometer {
-  right: 10px;
-  bottom: auto;
-  left: auto;
+  bottom: 40px;
+  right: 20px;
 }
 
 #loading-overlay {
